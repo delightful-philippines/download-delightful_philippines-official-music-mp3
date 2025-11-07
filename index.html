@@ -1,9 +1,171 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content='0; url="https://brigada-delightful-philippines.s3.ap-southeast-1.amazonaws.com/delightful_ph_music/Delightful+Philippines+(Official+Music+Video)+-+Delightful+Philippines.mp3"' />
-  </head>
-  <body>
-    <p>Downloading... If it doesn’t start, <a href="https://brigada-delightful-philippines.s3.ap-southeast-1.amazonaws.com/delightful_ph_music/Delightful+Philippines+(Official+Music+Video)+-+Delightful+Philippines.mp3">click here</a>.</p>
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download MP3</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+        
+        p {
+            color: #666;
+            margin: 0 0 30px 0;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .status.downloading {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status.success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🎵</div>
+        <h1>MP3 Download</h1>
+        <p>Your download will start automatically</p>
+        
+        <div id="status" class="status downloading">
+            <div class="spinner"></div>
+            Preparing download...
+        </div>
+        
+        <button id="retryBtn" style="display: none;" onclick="downloadFile()">
+            Try Again
+        </button>
+    </div>
+
+    <script>
+        // Configure your S3 bucket URL here
+        const S3_FILE_URL = 'https://brigada-delightful-philippines.s3.ap-southeast-1.amazonaws.com/delightful_ph_music/Delightful+Philippines+(Official+Music+Video)+-+Delightful+Philippines.mp3';
+        
+        // You can also use a custom domain or CloudFront URL:
+        // const S3_FILE_URL = 'https://your-cloudfront-domain.cloudfront.net/your-file.mp3';
+        
+        const statusEl = document.getElementById('status');
+        const retryBtn = document.getElementById('retryBtn');
+        
+        async function downloadFile() {
+            try {
+                statusEl.className = 'status downloading';
+                statusEl.innerHTML = '<div class="spinner"></div>Preparing download...';
+                retryBtn.style.display = 'none';
+                
+                // Create a temporary anchor element
+                const a = document.createElement('a');
+                a.href = S3_FILE_URL;
+                a.download = 'audio.mp3'; // You can customize the filename
+                
+                // Trigger the download
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                // Show success message
+                setTimeout(() => {
+                    statusEl.className = 'status success';
+                    statusEl.innerHTML = '✓ Download started successfully!';
+                }, 500);
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                statusEl.className = 'status error';
+                statusEl.innerHTML = '✗ Download failed. Please try again.';
+                retryBtn.style.display = 'inline-block';
+            }
+        }
+        
+        // Auto-start download when page loads
+        window.addEventListener('load', () => {
+            setTimeout(downloadFile, 1000); // Small delay for better UX
+        });
+    </script>
+</body>
 </html>
