@@ -126,38 +126,50 @@
         // Configure your S3 bucket URL here
         const S3_FILE_URL = 'https://brigada-delightful-philippines.s3.ap-southeast-1.amazonaws.com/delightful_ph_music/Delightful+Philippines+(Official+Music+Video)+-+Delightful+Philippines.mp3';
         
-        // You can also use a custom domain or CloudFront URL:
-        // const S3_FILE_URL = 'https://your-cloudfront-domain.cloudfront.net/your-file.mp3';
-        
         const statusEl = document.getElementById('status');
         const retryBtn = document.getElementById('retryBtn');
         
         async function downloadFile() {
             try {
                 statusEl.className = 'status downloading';
-                statusEl.innerHTML = '<div class="spinner"></div>Preparing download...';
+                statusEl.innerHTML = '<div class="spinner"></div>Downloading file...';
                 retryBtn.style.display = 'none';
+                
+                // Fetch the file as a blob to force download
+                const response = await fetch(S3_FILE_URL);
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const blob = await response.blob();
+                
+                // Create a blob URL
+                const blobUrl = window.URL.createObjectURL(blob);
                 
                 // Create a temporary anchor element
                 const a = document.createElement('a');
-                a.href = S3_FILE_URL;
-                a.download = 'audio.mp3'; // You can customize the filename
+                a.href = blobUrl;
+                a.download = 'Delightful-Philippines.mp3'; // Customize filename
                 
                 // Trigger the download
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 
-                // Show success message
+                // Clean up the blob URL
                 setTimeout(() => {
-                    statusEl.className = 'status success';
-                    statusEl.innerHTML = '✓ Download started successfully!';
-                }, 500);
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 100);
+                
+                // Show success message
+                statusEl.className = 'status success';
+                statusEl.innerHTML = '✓ Download started successfully!';
                 
             } catch (error) {
                 console.error('Download error:', error);
                 statusEl.className = 'status error';
-                statusEl.innerHTML = '✗ Download failed. Please try again.';
+                statusEl.innerHTML = '✗ Download failed. Please check your connection and try again.';
                 retryBtn.style.display = 'inline-block';
             }
         }
